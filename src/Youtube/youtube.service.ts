@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { SuccessResponse } from '../Responses/success.response';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-import ytdl =require('ytdl-core');
+import ytdl = require('ytdl-core');
 
 @Injectable()
 export class YoutubeService {
@@ -58,7 +58,10 @@ export class YoutubeService {
           itemVideo = itemVideo.videoRenderer;
           result.push({
             video_id: itemVideo.videoId,
-            thumbnail: itemVideo.thumbnail.thumbnails[itemVideo.thumbnail.thumbnails.length -1].url,
+            thumbnail:
+              itemVideo.thumbnail.thumbnails[
+                itemVideo.thumbnail.thumbnails.length - 1
+              ].url,
             title: itemVideo.title.runs[0].text,
             view_count_text: itemVideo.viewCountText.simpleText,
             chanel_name: itemVideo.longBylineText.runs[0].text,
@@ -78,10 +81,30 @@ export class YoutubeService {
   }
 
   async detailVideo(videoId: string): Promise<any> {
-    const info = await ytdl.getInfo(
+    const info: any = await ytdl.getInfo(
       'http://www.youtube.com/watch?v=' + videoId,
     );
-    console.log(info);
-    return new SuccessResponse(info);
+    let all = '';
+    let audio = '';
+    let video = '';
+    info.formats.forEach((item: any) => {
+      const itag = item.itag;
+      if ([22, 18, 43].indexOf(itag) !== -1) {
+        console.log(itag, item.url);
+        all = item.url;
+      }
+      if ([244, 247, 302, 135, 136, 298].indexOf(itag) !== -1) {
+        video = item.url;
+      }
+      if ([140, 171, 250].indexOf(itag) !== -1) {
+        audio = item.url;
+      }
+    });
+    const result = {
+      all: all,
+      video: video,
+      audio: audio,
+    };
+    return new SuccessResponse(result);
   }
 }
