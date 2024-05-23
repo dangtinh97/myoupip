@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { SuccessResponse } from '../Responses/success.response';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-import ytdl from 'ytdl-core';
+import ytdl =require('ytdl-core');
 
 @Injectable()
 export class YoutubeService {
   constructor() {}
 
   async videoSuggest(req: Request): Promise<any> {
+    console.log(req.headers);
     const url: string =
       'https://www.youtube.com/feed/trending?bp=4gINGgt5dG1hX2NoYXJ0cw%3D%3D';
     const f = await fetch(url, {
