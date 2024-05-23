@@ -8,7 +8,7 @@ import * as process from 'process';
 @Module({
   imports: [
     AccountModule,
-    MongooseModule.forRoot(process.env.MONGO_URI || 'mongodb://localhost/nest'),
+    // MongooseModule.forRoot(process.env.MONGO_URI || 'mongodb://localhost/nest'),
   ],
   controllers: [AppController],
   providers: [AppService],

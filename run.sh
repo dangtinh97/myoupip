@@ -1,2 +1,2 @@
 cd docker &&
-docker-compose up --build
+docker-compose -d up --build
