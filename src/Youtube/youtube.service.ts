@@ -10,7 +10,7 @@ export class YoutubeService {
   async videoSuggest(req: Request): Promise<any> {
     console.log(req.headers);
     const url: string =
-      'https://www.youtube.com/feed/trending?bp=4gINGgt5dG1hX2NoYXJ0cw%3D%3D';
+      'https://www.youtube.com/feed/trending?bp=4gINGgt5dG1hX2NoYXJ0cw%3D%3D&gl=VN&hl=vi';
     const f = await fetch(url, {
       method: 'GET',
       headers: req.headers,
@@ -58,7 +58,7 @@ export class YoutubeService {
           itemVideo = itemVideo.videoRenderer;
           result.push({
             video_id: itemVideo.videoId,
-            thumbnail: itemVideo.thumbnail.thumbnails[0].url,
+            thumbnail: itemVideo.thumbnail.thumbnails[itemVideo.thumbnail.thumbnails.length -1].url,
             title: itemVideo.title.runs[0].text,
             view_count_text: itemVideo.viewCountText.simpleText,
             chanel_name: itemVideo.longBylineText.runs[0].text,
