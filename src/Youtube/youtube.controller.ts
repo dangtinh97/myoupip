@@ -13,7 +13,7 @@ export class YoutubeController {
   }
 
   @Get('/new')
-  async videoSuggest(): Promise<any> {
-    return (await this.youtubeService.videoSuggest()).json();
+  async videoSuggest(@Req() request: Request): Promise<any> {
+    return (await this.youtubeService.videoSuggest(request)).json();
   }
 }

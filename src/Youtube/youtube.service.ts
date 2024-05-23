@@ -1,17 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { SuccessResponse } from '../Responses/success.response';
-import any = jasmine.any;
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const ytdl = require('ytdl-core');
+import ytdl from 'ytdl-core';
 
 @Injectable()
 export class YoutubeService {
   constructor() {}
 
-  async videoSuggest(): Promise<any> {
-    const url: string = 'https://www.youtube.com/feed/trending?bp=4gINGgt5dG1hX2NoYXJ0cw%3D%3D';
+  async videoSuggest(req: Request): Promise<any> {
+    const url: string =
+      'https://www.youtube.com/feed/trending?bp=4gINGgt5dG1hX2NoYXJ0cw%3D%3D';
     const f = await fetch(url, {
       method: 'GET',
+      headers: req.headers,
     });
     const body = await f.text();
     const myRe = new RegExp(/var ytInitialData = (.*?);</, 'i');
@@ -47,27 +48,28 @@ export class YoutubeService {
       const list =
         json.contents.twoColumnBrowseResultsRenderer.tabs[1].tabRenderer.content
           .sectionListRenderer.contents;
-      let result = []
-      list.forEach((item:any)=>{
-        const listContents = item.itemSectionRenderer.contents[0].shelfRenderer.content.expandedShelfContentsRenderer.items;
-        listContents.forEach((itemVideo:any)=>{
-          itemVideo = itemVideo.videoRenderer
+      let result = [];
+      list.forEach((item: any) => {
+        const listContents =
+          item.itemSectionRenderer.contents[0].shelfRenderer.content
+            .expandedShelfContentsRenderer.items;
+        listContents.forEach((itemVideo: any) => {
+          itemVideo = itemVideo.videoRenderer;
           result.push({
-            video_id:itemVideo.videoId,
+            video_id: itemVideo.videoId,
             thumbnail: itemVideo.thumbnail.thumbnails[0].url,
             title: itemVideo.title.runs[0].text,
             view_count_text: itemVideo.viewCountText.simpleText,
             chanel_name: itemVideo.longBylineText.runs[0].text,
-            chanel_url: itemVideo.longBylineText.runs[0].navigationEndpoint.browseEndpoint.canonicalBaseUrl
-          })
-
-          console.log(itemVideo)
-        })
-
-      })
+            chanel_url:
+              itemVideo.longBylineText.runs[0].navigationEndpoint.browseEndpoint
+                .canonicalBaseUrl,
+          });
+        });
+      });
       return result;
     } catch (e) {
-      console.error(e.message)
+      console.error(e.message);
       return [];
     }
 
