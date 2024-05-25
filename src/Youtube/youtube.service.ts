@@ -3,6 +3,9 @@ import { SuccessResponse } from '../Responses/success.response';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 import ytdl = require('ytdl-core');
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const _ = require('lodash');
+
 @Injectable()
 export class YoutubeService {
   constructor() {}
@@ -106,5 +109,28 @@ export class YoutubeService {
       audio: audio,
     };
     return new SuccessResponse(result);
+  }
+
+  async suggestKeyword(keyword: string): Promise<any> {
+    const time = Math.round(new Date().getTime() / 1000);
+    let url = `https://suggestqueries.google.com/complete/search?json=suggestCallBack&q=${keyword}&hl=vi&ds=yt&client=youtube&_=${time}`;
+    const curl = await fetch(url, {
+      headers: this.headerCurl(),
+      method: 'GET',
+    });
+    const json = await curl.json();
+    return new SuccessResponse({
+      list: json[1],
+    });
+  }
+
+  headerCurl(): any {
+    return {
+      'User-Agent':
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
+      'accept-language': 'vi-VN,vi;q=0.9',
+      cookie:
+        'GPS=1; YSC=8O5Dqkbfe3I; VISITOR_INFO1_LIVE=ZTRgRstulEA; PREF=tz=Asia.Saigon',
+    };
   }
 }

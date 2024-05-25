@@ -1,4 +1,4 @@
-import { Controller, Get, Req } from '@nestjs/common';
+import { Controller, Get, Param, Query, Req } from '@nestjs/common';
 import { YoutubeService } from './youtube.service';
 
 @Controller('/youtube')
@@ -16,4 +16,16 @@ export class YoutubeController {
   async videoSuggest(@Req() request: Request): Promise<any> {
     return (await this.youtubeService.videoSuggest(request)).json();
   }
+
+  @Get('/search')
+  async search(@Query('q') q: string): Promise<any> {
+    return '';
+  }
+
+  @Get('/suggest')
+  async suggestKeyword(@Query('keyword') keyword: string): Promise<any> {
+    return (await this.youtubeService.suggestKeyword(keyword)).json();
+  }
+
+
 }
