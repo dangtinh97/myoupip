@@ -125,11 +125,12 @@ export class YoutubeService {
   }
 
   async search(q: string): Promise<any> {
-    const url = `https://www.youtube.com/results?search_query={$q}&gl=VN`;
+    const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}&gl=VN`;
     const curl = await fetch(url, {
       method: 'GET',
       headers: this.headerCurl(),
     });
+    console.log(url);
     const body = await curl.text();
     const myRe = new RegExp(/var ytInitialData = (.*?);</, 'i');
     const myArray = myRe.exec(body);
@@ -144,7 +145,6 @@ export class YoutubeService {
     const result = [];
 
     contents.forEach((item: any) => {
-      console.log(Object.keys(item));
       if (Object.keys(item).indexOf('videoRenderer') === -1) {
         return;
       }
@@ -158,7 +158,6 @@ export class YoutubeService {
   }
 
   private transformerVideo(data: any): any {
-    console.log(data);
     const thumbnails = _.get(data, 'thumbnail.thumbnails');
     return {
       video_id: _.get(data, 'videoId'),
