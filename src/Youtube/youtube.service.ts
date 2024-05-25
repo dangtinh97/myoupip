@@ -59,19 +59,7 @@ export class YoutubeService {
             .expandedShelfContentsRenderer.items;
         listContents.forEach((itemVideo: any) => {
           itemVideo = itemVideo.videoRenderer;
-          result.push({
-            video_id: itemVideo.videoId,
-            thumbnail:
-              itemVideo.thumbnail.thumbnails[
-                itemVideo.thumbnail.thumbnails.length - 1
-              ].url,
-            title: itemVideo.title.runs[0].text,
-            view_count_text: itemVideo.viewCountText.simpleText,
-            chanel_name: itemVideo.longBylineText.runs[0].text,
-            chanel_url:
-              itemVideo.longBylineText.runs[0].navigationEndpoint.browseEndpoint
-                .canonicalBaseUrl,
-          });
+          result.push(this.transformerVideo(itemVideo));
         });
       });
       return result;
