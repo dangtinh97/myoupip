@@ -124,6 +124,56 @@ export class YoutubeService {
     });
   }
 
+  async search(q: string): Promise<any> {
+    const url = `https://www.youtube.com/results?search_query={$q}&gl=VN`;
+    const curl = await fetch(url, {
+      method: 'GET',
+      headers: this.headerCurl(),
+    });
+    const body = await curl.text();
+    const myRe = new RegExp(/var ytInitialData = (.*?);</, 'i');
+    const myArray = myRe.exec(body);
+    const json = JSON.parse(myArray[1]);
+    console.log(_.get(json, 'responseContext'));
+    const contents = _.get(
+      json,
+      'contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.0.itemSectionRenderer.contents',
+      [],
+    );
+
+    const result = [];
+
+    contents.forEach((item: any) => {
+      console.log(Object.keys(item));
+      if (Object.keys(item).indexOf('videoRenderer') === -1) {
+        return;
+      }
+      let data = item['videoRenderer'];
+      result.push(this.transformerVideo(data));
+    });
+
+    return new SuccessResponse({
+      list: result,
+    });
+  }
+
+  private transformerVideo(data: any): any {
+    console.log(data);
+    const thumbnails = _.get(data, 'thumbnail.thumbnails');
+    return {
+      video_id: _.get(data, 'videoId'),
+      thumbnail: thumbnails[thumbnails.length - 1].url,
+      title: _.get(data, 'title.runs[0].text', ''),
+      view_count_text: _.get(data, 'viewCountText.simpleText', ''),
+      chanel_name: _.get(data, 'longBylineText.runs[0].text', ''),
+      chanel_url: _.get(
+        data,
+        'longBylineText.runs[0].navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+        '',
+      ),
+    };
+  }
+
   headerCurl(): any {
     return {
       'User-Agent':

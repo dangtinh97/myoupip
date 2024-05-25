@@ -19,13 +19,11 @@ export class YoutubeController {
 
   @Get('/search')
   async search(@Query('q') q: string): Promise<any> {
-    return '';
+    return (await this.youtubeService.search(q)).json();
   }
 
   @Get('/suggest')
   async suggestKeyword(@Query('keyword') keyword: string): Promise<any> {
     return (await this.youtubeService.suggestKeyword(keyword)).json();
   }
-
-
 }
