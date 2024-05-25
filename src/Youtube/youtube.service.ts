@@ -135,7 +135,38 @@ export class YoutubeService {
     const myRe = new RegExp(/var ytInitialData = (.*?);</, 'i');
     const myArray = myRe.exec(body);
     const json = JSON.parse(myArray[1]);
-    console.log(_.get(json, 'responseContext'));
+    const contents = _.get(
+      json,
+      'contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.0.itemSectionRenderer.contents',
+      [],
+    );
+
+    const result = [];
+
+    contents.forEach((item: any) => {
+      if (Object.keys(item).indexOf('videoRenderer') === -1) {
+        return;
+      }
+      let data = item['videoRenderer'];
+      result.push(this.transformerVideo(data));
+    });
+
+    return new SuccessResponse({
+      list: result,
+    });
+  }
+
+  async videoRelated(videoId: string): Promise<any> {
+    const url = `https://www.youtube.com/watch?v=${videoId}&gl=VN`;
+    const curl = await fetch(url, {
+      method: 'GET',
+      headers: this.headerCurl(),
+    });
+    console.log(url);
+    const body = await curl.text();
+    const myRe = new RegExp(/var ytInitialData = (.*?);</, 'i');
+    const myArray = myRe.exec(body);
+    const json = JSON.parse(myArray[1]);
     const contents = _.get(
       json,
       'contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.0.itemSectionRenderer.contents',
