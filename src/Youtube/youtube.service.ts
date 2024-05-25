@@ -43,7 +43,7 @@ export class YoutubeService {
     return new SuccessResponse({
       reels: [],
       list: list,
-      token: JSON.parse(myArray[1]),
+      token: '',
     });
   }
 
@@ -52,7 +52,7 @@ export class YoutubeService {
       const list =
         json.contents.twoColumnBrowseResultsRenderer.tabs[1].tabRenderer.content
           .sectionListRenderer.contents;
-      let result = [];
+      const result = [];
       list.forEach((item: any) => {
         const listContents =
           item.itemSectionRenderer.contents[0].shelfRenderer.content
