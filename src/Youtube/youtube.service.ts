@@ -175,7 +175,6 @@ export class YoutubeService {
 
     return new SuccessResponse({
       list: result,
-      json: json,
     });
   }
 
