@@ -23,7 +23,7 @@ export class YoutubeController {
   }
   @Get('/suggest-by-video-id')
   async videoRelated(@Query('video-id') q: string): Promise<any> {
-    return (await this.youtubeService.search(q)).json();
+    return (await this.youtubeService.videoRelated(q)).json();
   }
 
   @Get('/suggest')

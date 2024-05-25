@@ -101,7 +101,7 @@ export class YoutubeService {
 
   async suggestKeyword(keyword: string): Promise<any> {
     const time = Math.round(new Date().getTime() / 1000);
-    let url = `https://suggestqueries.google.com/complete/search?json=suggestCallBack&q=${keyword}&hl=vi&ds=yt&client=youtube&_=${time}`;
+    const url = `https://suggestqueries.google.com/complete/search?json=suggestCallBack&q=${keyword}&hl=vi&ds=yt&client=youtube&_=${time}`;
     const curl = await fetch(url, {
       headers: this.headerCurl(),
       method: 'GET',
@@ -135,7 +135,7 @@ export class YoutubeService {
       if (Object.keys(item).indexOf('videoRenderer') === -1) {
         return;
       }
-      let data = item['videoRenderer'];
+      const data = item['videoRenderer'];
       result.push(this.transformerVideo(data));
     });
 
@@ -157,22 +157,25 @@ export class YoutubeService {
     const json = JSON.parse(myArray[1]);
     const contents = _.get(
       json,
-      'contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.0.itemSectionRenderer.contents',
+      'contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results',
       [],
     );
 
     const result = [];
 
     contents.forEach((item: any) => {
-      if (Object.keys(item).indexOf('videoRenderer') === -1) {
+      if (Object.keys(item).indexOf('compactVideoRenderer') === -1) {
         return;
       }
-      let data = item['videoRenderer'];
-      result.push(this.transformerVideo(data));
+      const data = item['compactVideoRenderer'];
+      let itemResult = this.transformerVideo(data);
+      itemResult.title = _.get(data, 'title.simpleText', '');
+      result.push(itemResult);
     });
 
     return new SuccessResponse({
       list: result,
+      json: json,
     });
   }
 
