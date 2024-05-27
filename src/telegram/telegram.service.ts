@@ -31,12 +31,13 @@ export class TelegramService {
       data: data,
     });
     const syncUser = await this.syncUser(_.get(data, 'message.from'));
+    console.log(syncUser);
     const command = this.detectCommand(data);
     if (command != null) {
       return await this.processCommand(command, syncUser);
     }
 
-    const text: any = _.get(data, 'message.text1');
+    const text: any = _.get(data, 'message.text');
     if (
       typeof text != 'undefined' &&
       typeof syncUser.connect_with_id !== 'undefined'
