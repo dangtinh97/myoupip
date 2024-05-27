@@ -1,17 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel as NestInjectModel } from '@nestjs/mongoose/dist/common/mongoose.decorators';
-import { User, UserDocument } from '../schemas/user.schema';
 import { Model } from 'mongoose';
 import { LogTelegram, LogTelegramDocument } from './schemas/log-tele.model';
 import { SuccessResponse } from '../Responses/success.response';
-import { TelegramUser, TelegramUserDocument } from './schemas/tele-user.model';
+import {
+  TelegramUser,
+  TelegramUserDocument,
+  USER_STATUS,
+} from './schemas/tele-user.model';
 import * as process from 'process';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const _ = require('lodash');
 
 @Injectable()
 export class TelegramService {
   public static START = 'START';
+  public static CONNECT = 'KETNOI';
 
   constructor(
     @NestInjectModel(LogTelegram.name)
@@ -24,18 +29,47 @@ export class TelegramService {
     await this.logModel.create({
       data: data,
     });
-    let syncUser = await this.syncUser(_.get(data, 'message.from'));
-    let command = this.detectCommand(data);
+    const syncUser = await this.syncUser(_.get(data, 'message.from'));
+    console.log(syncUser);
+    const command = this.detectCommand(data);
     if (command != null) {
-      return await this.processCommand(command, syncUser.id);
+      return await this.processCommand(command, syncUser);
     }
     return new SuccessResponse();
   }
 
-  async processCommand(command: string, id: string) {
+  async processCommand(command: string, { id, status }: any) {
+    console.log(id, status);
     if (command == TelegramService.START) {
       return this.commandStart(id);
     }
+    if (command == TelegramService.CONNECT) {
+      return this.commandStart(id);
+    }
+
+    if (command === TelegramService.CONNECT) {
+      return this.commandConnect(id, status);
+    }
+  }
+
+  async commandConnect(id: string, status: string) {
+    if (status === USER_STATUS.BUSY) {
+      return this.sendMessageToUser(id, 'Bạn đang kết nối với 1 người khác');
+    }
+
+    if (status === USER_STATUS.WAIT) {
+      return this.sendMessageToUser(
+        id,
+        'Vui lòng chờ đợi thêm, chúng tôi đang cố gắng kết nối bạn với người khác.',
+      );
+    }
+    await this.userModel
+      .updateOne({
+        telegram_id: id,
+        status: USER_STATUS.BUSY,
+      })
+      .exec();
+    return this.sendMessageToUser(id, 'Chúng tôi đang tìm kiếm người phù hợp với bạn');
   }
 
   async commandStart(id: string): Promise<any> {
@@ -66,21 +100,25 @@ export class TelegramService {
   }
 
   private async syncUser(data: any): Promise<any> {
-    console.log(data);
     const id = parseInt(data.id).toString();
-    let findUser = await this.userModel.findOne({
+    const findUser = await this.userModel.findOne({
       telegram_id: id,
     });
-    console.log(findUser);
+
     if (findUser == null) {
       await this.userModel.create({
         telegram_id: id,
         username: _.get(data, 'username'),
         first_name: _.get(data, 'first_name'),
+        status: USER_STATUS.FREE.toString(),
       });
     }
     return {
       id: id,
+      status:
+        findUser == null || typeof findUser.status === 'undefined'
+          ? USER_STATUS.FREE.toString()
+          : findUser.status,
     };
   }
 

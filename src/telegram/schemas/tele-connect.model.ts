@@ -3,18 +3,12 @@ import any = jasmine.any;
 import { HydratedDocument } from 'mongoose';
 import { User } from '../../schemas/user.schema';
 
-export type TelegramUserDocument = HydratedDocument<TelegramUser>;
+export type TelegramConnectDocument = HydratedDocument<TelegramConnect>;
 
 @Schema({ timestamps: true, collection: 'tele_users' })
-export class TelegramUser {
+export class TelegramConnect {
   @Prop({ type: String })
   telegram_id: string;
-
-  @Prop()
-  first_name: string;
-
-  @Prop()
-  username: string;
 
   @Prop()
   status: string;
@@ -23,10 +17,5 @@ export class TelegramUser {
   connect_with_id: string;
 }
 
-export enum USER_STATUS {
-  FREE = 'FREE',
-  BUSY = 'BUSY',
-  WAIT = 'WAIT',
-}
-
-export const TelegramUserSchema = SchemaFactory.createForClass(TelegramUser);
+export const TelegramConnectSchema =
+  SchemaFactory.createForClass(TelegramConnect);
