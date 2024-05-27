@@ -17,6 +17,7 @@ const _ = require('lodash');
 export class TelegramService {
   public static START = 'START';
   public static CONNECT = 'KETNOI';
+  public static DISCONNECT = 'KETTHUC';
 
   constructor(
     @NestInjectModel(LogTelegram.name)
@@ -39,7 +40,7 @@ export class TelegramService {
     return new SuccessResponse();
   }
 
-  async processCommand(command: string, { id, status }: any) {
+  async processCommand(command: string, { id, status, connect_with_id }: any) {
     console.log(id, status);
     if (command == TelegramService.START) {
       return this.commandStart(id);
@@ -48,6 +49,41 @@ export class TelegramService {
     if (command === TelegramService.CONNECT) {
       return this.commandConnect(id, status);
     }
+    if (command === TelegramService.DISCONNECT) {
+      return this.commandDisconnect(id, status, connect_with_id);
+    }
+  }
+
+  async commandDisconnect(
+    id: string,
+    status: string,
+    connect_with_id: any,
+  ): Promise<any> {
+    await this.userModel.updateOne(
+      {
+        telegram_id: id,
+      },
+      {
+        status: USER_STATUS.FREE,
+        connect_with_id: null,
+      },
+    );
+
+    if (typeof connect_with_id != 'undefined') {
+      this.userModel.updateOne(
+        {
+          telegram_id: connect_with_id,
+        },
+        {
+          status: USER_STATUS.FREE,
+          connect_with_id: null,
+        },
+      );
+      await this.sendMessageToUser(connect_with_id, 'Đã ngắt kết nối.');
+    }
+
+    await this.sendMessageToUser(id, 'Đã ngắt kết nối.');
+    return true;
   }
 
   async commandConnect(id: string, status: string) {
@@ -166,6 +202,10 @@ export class TelegramService {
         findUser == null || typeof findUser.status === 'undefined'
           ? USER_STATUS.FREE.toString()
           : findUser.status,
+      connect_with_id:
+        findUser == null || typeof findUser.status === 'undefined'
+          ? null
+          : findUser.connect_with_id,
     };
   }
 
