@@ -32,6 +32,7 @@ export class TelegramService {
     const syncUser = await this.syncUser(_.get(data, 'message.from'));
     console.log(syncUser);
     const command = this.detectCommand(data);
+    console.log(command);
     if (command != null) {
       return await this.processCommand(command, syncUser);
     }
@@ -41,9 +42,6 @@ export class TelegramService {
   async processCommand(command: string, { id, status }: any) {
     console.log(id, status);
     if (command == TelegramService.START) {
-      return this.commandStart(id);
-    }
-    if (command == TelegramService.CONNECT) {
       return this.commandStart(id);
     }
 
