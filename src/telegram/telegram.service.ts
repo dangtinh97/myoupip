@@ -57,19 +57,60 @@ export class TelegramService {
       return this.sendMessageToUser(id, 'Bạn đang kết nối với 1 người khác');
     }
 
+    const idConnect = await this.findUserWait(id);
+    if (idConnect != null) {
+      await this.sendMessageToUser(
+        id,
+        `Bạn đã được kết nối với id ${idConnect}`,
+      );
+      await this.sendMessageToUser(
+        idConnect,
+        `Bạn đã được kết nối với id ${id}`,
+      );
+      return true;
+    }
+
     if (status === USER_STATUS.WAIT) {
       return this.sendMessageToUser(
         id,
         'Vui lòng chờ đợi thêm, chúng tôi đang cố gắng kết nối bạn với người khác.',
       );
     }
+
     await this.userModel
       .updateOne({
         telegram_id: id,
-        status: USER_STATUS.BUSY,
+        status: USER_STATUS.WAIT,
       })
       .exec();
-    return this.sendMessageToUser(id, 'Chúng tôi đang tìm kiếm người phù hợp với bạn');
+    return this.sendMessageToUser(
+      id,
+      'Chúng tôi đang tìm kiếm người phù hợp với bạn',
+    );
+  }
+
+  private async findUserWait(id: string): Promise<any> {
+    const find = await this.userModel.findOne({
+      telegram_id: {
+        $ne: id,
+      },
+      status: USER_STATUS.WAIT,
+    });
+    if (find == null) {
+      return null;
+    }
+    await this.userModel.updateOne({
+      telegram_id: find.telegram_id,
+      status: USER_STATUS.BUSY,
+      connect_with_id: id,
+    });
+
+    await this.userModel.updateOne({
+      telegram_id: id,
+      status: USER_STATUS.BUSY,
+      connect_with_id: find.telegram_id,
+    });
+    return id;
   }
 
   async commandStart(id: string): Promise<any> {
