@@ -31,11 +31,17 @@ export class TelegramService {
       data: data,
     });
     const syncUser = await this.syncUser(_.get(data, 'message.from'));
-    console.log(syncUser);
     const command = this.detectCommand(data);
-    console.log(command);
     if (command != null) {
       return await this.processCommand(command, syncUser);
+    }
+
+    const text: any = _.get(data, 'message.text1');
+    if (
+      typeof text != 'undefined' &&
+      typeof syncUser.connect_with_id !== 'undefined'
+    ) {
+      await this.sendMessageToUser(syncUser.connect_with_id, text);
     }
     return new SuccessResponse();
   }
@@ -210,7 +216,7 @@ export class TelegramService {
   }
 
   private detectCommand(data: any): string {
-    let command = _.get(data, 'message.entities.0.type');
+    const command = _.get(data, 'message.entities.0.type');
     if (typeof command == 'undefined' || command !== 'bot_command') {
       return null;
     }
