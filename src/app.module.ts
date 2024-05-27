@@ -5,11 +5,13 @@ import { AccountModule } from './Account/account.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { YoutubeModule } from './Youtube/youtube.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TelegramModule } from "./telegram/telegram.module";
 
 @Module({
   imports: [
     AccountModule,
     YoutubeModule,
+    TelegramModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
