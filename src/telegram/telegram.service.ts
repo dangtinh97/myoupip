@@ -59,11 +59,11 @@ export class TelegramService {
     if (idConnect != null) {
       await this.sendMessageToUser(
         id,
-        `Bạn đã được kết nối với id ${idConnect}`,
+        `Bạn đã được kết nối với id ${this.replaceId(idConnect)}`,
       );
       await this.sendMessageToUser(
         idConnect,
-        `Bạn đã được kết nối với id ${id}`,
+        `Bạn đã được kết nối với id ${this.replaceId(id)}`,
       );
       return true;
     }
@@ -97,18 +97,26 @@ export class TelegramService {
     if (find == null) {
       return null;
     }
-    await this.userModel.updateOne({
-      telegram_id: find.telegram_id,
-      status: USER_STATUS.BUSY,
-      connect_with_id: id,
-    });
+    await this.userModel.updateOne(
+      {
+        telegram_id: find.telegram_id,
+      },
+      {
+        status: USER_STATUS.BUSY,
+        connect_with_id: id,
+      },
+    );
 
-    await this.userModel.updateOne({
-      telegram_id: id,
-      status: USER_STATUS.BUSY,
-      connect_with_id: find.telegram_id,
-    });
-    return id;
+    await this.userModel.updateOne(
+      {
+        telegram_id: id,
+      },
+      {
+        status: USER_STATUS.BUSY,
+        connect_with_id: find.telegram_id,
+      },
+    );
+    return find.telegram_id;
   }
 
   async commandStart(id: string): Promise<any> {
@@ -167,5 +175,16 @@ export class TelegramService {
       return null;
     }
     return _.get(data, 'message.text').replace('/', '').toUpperCase();
+  }
+
+  private replaceId(chuoi: string) {
+    const middleIndex = Math.floor(chuoi.length / 2);
+
+    // Xác định phần đầu và phần cuối sau khi thay thế phần giữa bằng "xxx"
+    const phanDau = chuoi.substring(0, middleIndex - 1);
+    const phanCuoi = chuoi.substring(middleIndex + 2);
+
+    // Chèn "xxx" vào giữa thay thế cho phần đã bị cắt bỏ
+    return phanDau + 'xxx' + phanCuoi;
   }
 }
