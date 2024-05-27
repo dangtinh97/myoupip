@@ -76,8 +76,8 @@ export class TelegramService {
       },
     );
 
-    if (typeof connect_with_id != 'undefined') {
-      this.userModel.updateOne(
+    if (connect_with_id) {
+      await this.userModel.updateOne(
         {
           telegram_id: connect_with_id,
         },
@@ -86,7 +86,10 @@ export class TelegramService {
           connect_with_id: null,
         },
       );
-      await this.sendMessageToUser(connect_with_id, 'Đã ngắt kết nối.');
+      await this.sendMessageToUser(
+        connect_with_id,
+        `Đã ngắt kết nối với ${this.replaceId(id)}`,
+      );
     }
 
     await this.sendMessageToUser(id, 'Đã ngắt kết nối.');
