@@ -116,18 +116,15 @@ export class TelegramService {
       return true;
     }
 
-    if (status === USER_STATUS.WAIT) {
-      return this.sendMessageToUser(
-        id,
-        'Vui lòng chờ đợi thêm, chúng tôi đang cố gắng kết nối bạn với người khác.',
-      );
-    }
-
     await this.userModel
-      .updateOne({
-        telegram_id: id,
-        status: USER_STATUS.WAIT,
-      })
+      .updateOne(
+        {
+          telegram_id: id,
+        },
+        {
+          status: USER_STATUS.WAIT,
+        },
+      )
       .exec();
     return this.sendMessageToUser(
       id,
