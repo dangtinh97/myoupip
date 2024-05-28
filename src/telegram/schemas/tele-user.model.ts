@@ -21,6 +21,9 @@ export class TelegramUser {
 
   @Prop()
   connect_with_id: string;
+
+  @Prop()
+  last_name: string;
 }
 
 export enum USER_STATUS {

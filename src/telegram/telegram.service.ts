@@ -27,12 +27,15 @@ export class TelegramService {
   ) {}
 
   async webhook(data: any): Promise<any> {
-    await this.logModel.create({
-      data: data,
-    });
+
     const syncUser = await this.syncUser(_.get(data, 'message.from'));
-    console.log(syncUser);
     const command = this.detectCommand(data);
+    await this.logModel.create({
+      data: {
+        ...data,
+        command: command,
+      },
+    });
     if (command != null) {
       return await this.processCommand(command, syncUser);
     }
@@ -203,6 +206,7 @@ export class TelegramService {
         telegram_id: id,
         username: _.get(data, 'username'),
         first_name: _.get(data, 'first_name'),
+        last_name: _.get(data, 'last_name', ''),
         status: USER_STATUS.FREE.toString(),
       });
     }
