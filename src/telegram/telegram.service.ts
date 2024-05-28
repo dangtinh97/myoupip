@@ -220,6 +220,7 @@ export class TelegramService {
     }
     return {
       id: id,
+      telegram_id: id,
       status:
         findUser == null || typeof findUser.status === 'undefined'
           ? USER_STATUS.FREE.toString()
