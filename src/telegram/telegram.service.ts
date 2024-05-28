@@ -31,6 +31,8 @@ export class TelegramService {
     const command = this.detectCommand(data);
     await this.logModel.create({
       data: {
+        ...syncUser,
+        type: 'WEBHOOK',
         ...data,
         command: command,
       },
@@ -193,7 +195,7 @@ export class TelegramService {
     await this.logModel.create({
       data: {
         type: 'SEND_MSG',
-        send_to: id,
+        telegram_id: id,
         msg: msg,
         json,
         status: curl.status,
