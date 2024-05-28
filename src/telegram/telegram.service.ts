@@ -27,7 +27,6 @@ export class TelegramService {
   ) {}
 
   async webhook(data: any): Promise<any> {
-
     const syncUser = await this.syncUser(_.get(data, 'message.from'));
     const command = this.detectCommand(data);
     await this.logModel.create({
@@ -180,7 +179,7 @@ export class TelegramService {
   }
 
   async sendMessageToUser(id: string, msg: string) {
-    await fetch(
+    const curl = await fetch(
       `https://api.telegram.org/bot${process.env.TOKEN_TELEGRAM_BOT}/sendMessage`,
       {
         headers: {
@@ -193,6 +192,16 @@ export class TelegramService {
         }),
       },
     );
+    const json = await curl.json();
+    await this.logModel.create({
+      data: {
+        type: 'SEND_MSG',
+        send_to: id,
+        msg: msg,
+        json,
+        status: curl.status,
+      },
+    });
   }
 
   private async syncUser(data: any): Promise<any> {
