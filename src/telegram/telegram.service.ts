@@ -18,6 +18,8 @@ export class TelegramService {
   public static START = 'START';
   public static CONNECT = 'KETNOI';
   public static DISCONNECT = 'KETTHUC';
+  public static BANNED = 'BANNED';
+  public static ADMINS = ['1780297956', '1785164564'];
 
   constructor(
     @NestInjectModel(LogTelegram.name)
@@ -28,6 +30,12 @@ export class TelegramService {
 
   async webhook(data: any): Promise<any> {
     const syncUser = await this.syncUser(_.get(data, 'message.from'));
+    if (syncUser.status === USER_STATUS.BANNED) {
+      return this.sendMessageToUser(
+        syncUser.telegram_id,
+        'Bạn đã bị chặn bởi hệ thống',
+      );
+    }
     const command = this.detectCommand(data);
     await this.logModel.create({
       data: {
@@ -62,6 +70,10 @@ export class TelegramService {
     }
     if (command === TelegramService.DISCONNECT) {
       return this.commandDisconnect(id, status, connect_with_id);
+    }
+
+    if (command.indexOf(TelegramService.BANNED) !== -1) {
+      return this.commandBanned(command, id);
     }
   }
 
@@ -249,5 +261,49 @@ export class TelegramService {
 
     // Chèn "xxx" vào giữa thay thế cho phần đã bị cắt bỏ
     return phanDau + 'xxx' + phanCuoi;
+  }
+
+  private async commandBanned(cmd: string, id: string): Promise<any> {
+    if (TelegramService.ADMINS.indexOf(id) === -1) {
+      return this.sendMessageToUser(
+        id,
+        'Lêu Lêu bạn không có quyền thực hiện lệnh này',
+      );
+    }
+    const text = cmd.replace('BANNED', '').trim();
+    const splits: any = text.split('XXX');
+    const users: any = await this.userModel.find();
+    let idBanned = '';
+    let count = 0;
+    users.forEach((user: any) => {
+      if (
+        user.telegram_id.startsWith(splits[0]) &&
+        user.telegram_id.endsWith(splits[1])
+      ) {
+        count++;
+        idBanned = user.telegram_id;
+      }
+    });
+
+    if (count !== 1) {
+      return this.sendMessageToUser(id, 'Số lượng id tìm thấy là ' + count);
+    }
+
+    if (TelegramService.ADMINS.indexOf(idBanned) !== -1) {
+      return this.sendMessageToUser(id, `Không thể chặn id: ${idBanned}`);
+    }
+
+    await this.userModel.findOneAndUpdate(
+      {
+        telegram_id: idBanned,
+      },
+      {
+        $set: {
+          status: USER_STATUS.BANNED,
+        },
+      },
+    );
+
+    return this.sendMessageToUser(id, `Đã chặn id: ${idBanned}`);
   }
 }

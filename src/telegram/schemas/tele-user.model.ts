@@ -30,6 +30,7 @@ export enum USER_STATUS {
   FREE = 'FREE',
   BUSY = 'BUSY',
   WAIT = 'WAIT',
+  BANNED = 'BANNED',
 }
 
 export const TelegramUserSchema = SchemaFactory.createForClass(TelegramUser);
