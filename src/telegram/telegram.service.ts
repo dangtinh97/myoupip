@@ -33,7 +33,7 @@ export class TelegramService {
     if (syncUser.status === USER_STATUS.BANNED) {
       return this.sendMessageToUser(
         syncUser.telegram_id,
-        'Bạn đã bị chặn bởi hệ thống',
+        'Bạn đã bị chặn bởi hệ thống.',
       );
     }
     const command = this.detectCommand(data);
@@ -286,13 +286,16 @@ export class TelegramService {
     });
 
     if (count !== 1) {
-      return this.sendMessageToUser(id, 'Số lượng id tìm thấy là ' + count);
+      return await this.sendMessageToUser(
+        id,
+        'Số lượng id tìm thấy là ' + count,
+      );
     }
 
     if (TelegramService.ADMINS.indexOf(idBanned) !== -1) {
-      return this.sendMessageToUser(id, `Không thể chặn id: ${idBanned}`);
+      return await this.sendMessageToUser(id, `Không thể chặn id: ${idBanned}`);
     }
-
+    await this.sendMessageToUser(id, `Bạn đã bị chặn bởi hệ thống.`);
     await this.userModel.findOneAndUpdate(
       {
         telegram_id: idBanned,
