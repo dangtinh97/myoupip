@@ -29,34 +29,39 @@ export class TelegramService {
   ) {}
 
   async webhook(data: any): Promise<any> {
-    const syncUser = await this.syncUser(_.get(data, 'message.from'));
-    if (syncUser.status === USER_STATUS.BANNED) {
-      return this.sendMessageToUser(
-        syncUser.telegram_id,
-        'Bạn đã bị chặn bởi hệ thống.',
-      );
-    }
-    const command = this.detectCommand(data);
-    await this.logModel.create({
-      data: {
-        ...syncUser,
-        type: 'WEBHOOK',
-        ...data,
-        command: command,
-      },
-    });
-    if (command != null) {
-      return await this.processCommand(command, syncUser);
-    }
+    try {
+      const syncUser = await this.syncUser(_.get(data, 'message.from'));
+      if (syncUser.status === USER_STATUS.BANNED) {
+        return this.sendMessageToUser(
+          syncUser.telegram_id,
+          'Bạn đã bị chặn bởi hệ thống.',
+        );
+      }
+      const command = this.detectCommand(data);
+      await this.logModel.create({
+        data: {
+          ...syncUser,
+          type: 'WEBHOOK',
+          ...data,
+          command: command,
+        },
+      });
+      if (command != null) {
+        return await this.processCommand(command, syncUser);
+      }
 
-    const text: any = _.get(data, 'message.text');
-    if (
-      typeof text != 'undefined' &&
-      typeof syncUser.connect_with_id !== 'undefined'
-    ) {
-      await this.sendMessageToUser(syncUser.connect_with_id, text);
+      const text: any = _.get(data, 'message.text');
+      if (
+        typeof text != 'undefined' &&
+        typeof syncUser.connect_with_id !== 'undefined'
+      ) {
+        await this.sendMessageToUser(syncUser.connect_with_id, text);
+      }
+      return new SuccessResponse();
+    } catch (e: any) {
+      await this.sendMessageToUser('1785164564', e?.message);
     }
-    return new SuccessResponse();
+    return 'OK';
   }
 
   async processCommand(command: string, { id, status, connect_with_id }: any) {
