@@ -24,6 +24,9 @@ export class TelegramUser {
 
   @Prop()
   last_name: string;
+
+  @Prop()
+  send_from_bot: boolean;
 }
 
 export enum USER_STATUS {

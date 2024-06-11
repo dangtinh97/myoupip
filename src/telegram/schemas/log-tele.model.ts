@@ -7,6 +7,8 @@ export type LogTelegramDocument = HydratedDocument<LogTelegram>;
 export class LogTelegram {
   @Prop({ type: Object })
   data: any;
+  @Prop()
+  type: string;
 }
 
 export const LogTelegramSchema = SchemaFactory.createForClass(LogTelegram);

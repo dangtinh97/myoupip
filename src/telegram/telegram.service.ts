@@ -9,6 +9,7 @@ import {
   USER_STATUS,
 } from './schemas/tele-user.model';
 import * as process from 'process';
+import { ExceptionHandler } from '@nestjs/core/errors/exception-handler';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const _ = require('lodash');
@@ -60,8 +61,24 @@ export class TelegramService {
       }
       return new SuccessResponse();
     } catch (e: any) {
-      console.error(e);
-      await this.sendMessageToUser('1785164564', e?.message);
+      console.log(e.stack);
+      await this.logModel.create({
+        data: {
+          error: e,
+          msg: e.message,
+          line: e.line,
+          data: JSON.stringify(data),
+        },
+        type: 'ERROR_WEBHOOK',
+      });
+      await this.sendMessageToUser(
+        '1785164564',
+        JSON.stringify({
+          msg: e.message,
+          stack: e.stack,
+          data: JSON.stringify(data),
+        }),
+      );
     }
     return 'OK';
   }
@@ -245,8 +262,8 @@ export class TelegramService {
         chat_id: id,
       };
     }
-    
-    console.log(body)
+
+    console.log(body);
 
     const curl = await fetch(
       `https://api.telegram.org/bot${process.env.TOKEN_TELEGRAM_BOT}/sendMessage`,
@@ -364,5 +381,38 @@ export class TelegramService {
     );
 
     return this.sendMessageToUser(id, `Đã chặn id: ${idBanned}`);
+  }
+
+  private async sendDaily() {
+    let users = await this.userModel.find({
+      send_from_bot: {
+        $ne: false,
+      },
+    });
+
+    for (let i = 0; i < users.length - 1; i++) {
+      let send = await this.messageDaily(users[i].telegram_id);
+    }
+  }
+
+  private async messageDaily(to: string): Promise<number> {
+    //CQACAgUAAxkBAAKZyGZocrqTWG8nveAE6N7WfkBMWVBwAAK-DwACXxZAVz-ayJOgN6TxNQQ
+
+    let body = {
+      chat_id: to,
+      audio: '',
+    };
+    const curl = await fetch(
+      `https://api.telegram.org/bot${process.env.TOKEN_TELEGRAM_BOT}/sendAudio`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+        body: JSON.stringify(body),
+      },
+    );
+    const json = await curl.json();
+    return 1;
   }
 }
