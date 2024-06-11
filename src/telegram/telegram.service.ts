@@ -147,15 +147,29 @@ export class TelegramService {
   }
 
   private async findUserWait(id: string): Promise<any> {
-    const find = await this.userModel.findOne({
-      telegram_id: {
-        $ne: id,
+    // const find = await this.userModel.findOne({
+    //   telegram_id: {
+    //     $ne: id,
+    //   },
+    //   status: USER_STATUS.WAIT,
+    // });
+
+    const search: any[] = await this.userModel.aggregate([
+      {
+        $match: {
+          telegram_id: {
+            $ne: id,
+          },
+          status: USER_STATUS.WAIT,
+        },
       },
-      status: USER_STATUS.WAIT,
-    });
-    if (find == null) {
+      { $sample: { size: 1 } },
+    ]);
+
+    if (search.length == 0) {
       return null;
     }
+    const find = length[0];
     await this.userModel.updateOne(
       {
         telegram_id: find.telegram_id,
