@@ -19,6 +19,7 @@ export class TelegramService {
   public static CONNECT = 'KETNOI';
   public static DISCONNECT = 'KETTHUC';
   public static BANNED = 'BANNED';
+  public static ADMIN = 'ADMIN';
   public static ADMINS = ['1780297956', '1785164564'];
 
   constructor(
@@ -68,18 +69,22 @@ export class TelegramService {
   async processCommand(command: string, { id, status, connect_with_id }: any) {
     console.log(id, status);
     if (command == TelegramService.START) {
-      return this.commandStart(id);
+      return await this.commandStart(id);
     }
 
     if (command === TelegramService.CONNECT) {
-      return this.commandConnect(id, status);
+      return await this.commandConnect(id, status);
     }
     if (command === TelegramService.DISCONNECT) {
-      return this.commandDisconnect(id, status, connect_with_id);
+      return await this.commandDisconnect(id, status, connect_with_id);
     }
 
     if (command.indexOf(TelegramService.BANNED) !== -1) {
-      return this.commandBanned(command, id);
+      return await this.commandBanned(command, id);
+    }
+
+    if (command === TelegramService.ADMIN) {
+      return await this.commandAdmin(id);
     }
   }
 
@@ -118,6 +123,27 @@ export class TelegramService {
     return true;
   }
 
+  async commandAdmin(id: any) {
+    await this.sendMessageToUser(id, {
+      text: 'Hiện giờ bạn có thể gửi confession tại đây hoặc gửi tin nhắn trực tiếp tới admin.',
+      parse_mode: 'markdown',
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: 'gửi confession',
+              url: 'https://docs.google.com/forms/d/e/1FAIpQLSfvuNQ7R-Rq5n3zsGm3xyEzhnL0SZTO_BAuQruBmkiiwSFpHw/viewform',
+            },
+            {
+              text: 'Chat with admin',
+              url: 'https://t.me/dangtinh_97',
+            },
+          ],
+        ],
+      },
+    });
+  }
+
   async commandConnect(id: string, status: string) {
     if (status === USER_STATUS.BUSY) {
       return this.sendMessageToUser(id, 'Bạn đang kết nối với 1 người khác');
@@ -153,13 +179,6 @@ export class TelegramService {
   }
 
   private async findUserWait(id: string): Promise<any> {
-    // const find = await this.userModel.findOne({
-    //   telegram_id: {
-    //     $ne: id,
-    //   },
-    //   status: USER_STATUS.WAIT,
-    // });
-
     const search: any[] = await this.userModel.aggregate([
       {
         $match: {
@@ -209,7 +228,26 @@ export class TelegramService {
     );
   }
 
-  async sendMessageToUser(id: string, msg: string) {
+  async sendMessageToUser(id: string, msg: any) {
+    let body: any = {
+      chat_id: id,
+    };
+
+    if (typeof msg === 'string') {
+      body = {
+        chat_id: id,
+        text: msg,
+      };
+    }
+    if (typeof msg === 'object') {
+      body = {
+        ...JSON.parse(JSON.stringify(msg)),
+        chat_id: id,
+      };
+    }
+    
+    console.log(body)
+
     const curl = await fetch(
       `https://api.telegram.org/bot${process.env.TOKEN_TELEGRAM_BOT}/sendMessage`,
       {
@@ -217,13 +255,11 @@ export class TelegramService {
           'Content-Type': 'application/json',
         },
         method: 'POST',
-        body: JSON.stringify({
-          chat_id: id,
-          text: msg,
-        }),
+        body: JSON.stringify(body),
       },
     );
     const json = await curl.json();
+    console.log(json, body);
     await this.logModel.create({
       data: {
         type: 'SEND_MSG',
