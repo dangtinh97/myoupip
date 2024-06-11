@@ -59,6 +59,7 @@ export class TelegramService {
       }
       return new SuccessResponse();
     } catch (e: any) {
+      console.error(e);
       await this.sendMessageToUser('1785164564', e?.message);
     }
     return 'OK';
@@ -174,7 +175,7 @@ export class TelegramService {
     if (search.length == 0) {
       return null;
     }
-    const find = length[0];
+    const find = search[0];
     await this.userModel.updateOne(
       {
         telegram_id: find.telegram_id,
