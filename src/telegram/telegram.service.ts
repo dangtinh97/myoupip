@@ -131,7 +131,7 @@ export class TelegramService {
         inline_keyboard: [
           [
             {
-              text: 'Gửi confession',
+              text: 'Gửi Confession',
               url: 'https://docs.google.com/forms/d/e/1FAIpQLSfvuNQ7R-Rq5n3zsGm3xyEzhnL0SZTO_BAuQruBmkiiwSFpHw/viewform',
             },
             {
