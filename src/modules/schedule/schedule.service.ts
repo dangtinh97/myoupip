@@ -3,7 +3,7 @@ import { Cron } from '@nestjs/schedule';
 import { InjectModel as NestInjectModel } from '@nestjs/mongoose/dist/common/mongoose.decorators';
 import { Model } from 'mongoose';
 import { LcmHealth, LcmHealthDocument } from './schemas/health.schema';
-import * as process from "process";
+import * as process from 'process';
 
 @Injectable()
 export class ScheduleService {
@@ -24,29 +24,37 @@ export class ScheduleService {
   }
 
   async curlData(data: any): Promise<any> {
-    const curl = await fetch(data.url, {
-      method: data.type,
-      body:
-        data.type === 'POST' && typeof data.data != 'undefined'
-          ? JSON.stringify(data.data)
-          : null,
-    });
-    await this.healthModel
-      .findOneAndUpdate(
-        {
-          _id: data._id,
-        },
-        {
-          $set: {
-            status: curl.status,
+    try {
+      const curl = await fetch(data.url, {
+        method: data.type,
+        body:
+          data.type === 'POST' && typeof data.data != 'undefined'
+            ? JSON.stringify(data.data)
+            : null,
+      });
+      await this.healthModel
+        .findOneAndUpdate(
+          {
+            _id: data._id,
           },
-        },
-      )
-      .exec();
-    if (!curl.ok && curl.status != 404) {
+          {
+            $set: {
+              status: curl.status,
+            },
+          },
+        )
+        .exec();
+      if (!curl.ok && curl.status != 404) {
+        await this.sendNotification({
+          url: data.url,
+          status: curl.status,
+        });
+      }
+      return true;
+    } catch (e: any) {
       await this.sendNotification({
         url: data.url,
-        status: curl.status,
+        message: e.message,
       });
     }
     return true;
