@@ -5,13 +5,16 @@ import { AccountModule } from './Account/account.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { YoutubeModule } from './Youtube/youtube.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TelegramModule } from "./telegram/telegram.module";
+import { TelegramModule } from './telegram/telegram.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { CronModule } from './modules/schedule/schedule.module';
 
 @Module({
   imports: [
     AccountModule,
     YoutubeModule,
     TelegramModule,
+    CronModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -25,7 +28,6 @@ import { TelegramModule } from "./telegram/telegram.module";
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-
   ],
   controllers: [AppController],
   providers: [AppService],
