@@ -3,6 +3,7 @@ import { Cron } from '@nestjs/schedule';
 import { InjectModel as NestInjectModel } from '@nestjs/mongoose/dist/common/mongoose.decorators';
 import { Model } from 'mongoose';
 import { LcmHealth, LcmHealthDocument } from './schemas/health.schema';
+import * as process from "process";
 
 @Injectable()
 export class ScheduleService {
@@ -53,7 +54,7 @@ export class ScheduleService {
 
   async sendNotification(data: any) {
     await fetch(
-      'https://api.telegram.org/bot6977170023:AAFCKOTR71eUNeIkjBGZx8FCFdz2anmQNks/sendMessage',
+      `https://api.telegram.org/bot${process.env.TOKEN_TELEGRAM_BOT_HEALTH}/sendMessage`,
       {
         method: 'POST',
         headers: {
