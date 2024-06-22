@@ -33,7 +33,6 @@ export class JiraService {
   }
 
   async createIssue(issue: any) {
-    console.log(issue);
     const id = _.get(issue, 'id', '');
     const projectKey = _.get(issue, 'fields.project.key', '');
     const summary = _.get(issue, 'fields.summary', '');
@@ -43,6 +42,24 @@ export class JiraService {
       projectKey === process.env.KEY_PROJECT_FIRST
         ? process.env.PROJECT_SECOND
         : process.env.PROJECT_FIRST;
+    const now = new Date();
+    const time = now.setMinutes(now.getMinutes() - 1);
+    const find = await this.jiraProjectModel.findOne({
+      summary: summary,
+      createdAt: {
+        $gte: time,
+      },
+    });
+    if (find) {
+      await this.jiraLogModel.create({
+        key: 'DUPLICATE_ISSUE',
+        data: {
+          summary,
+        },
+      });
+      console.log('DUPLICATE');
+      return;
+    }
     const newIssue = await this.sync({
       project: projectNew,
       summary: summary,
@@ -59,7 +76,6 @@ export class JiraService {
   }
 
   async sync({ project, summary, issue_type }): Promise<any> {
-    return {};
     try {
       const curl = await fetch(`${project.split('|')[1]}/rest/api/3/issue`, {
         method: 'POST',
