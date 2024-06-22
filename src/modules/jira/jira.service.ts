@@ -59,6 +59,7 @@ export class JiraService {
   }
 
   async sync({ project, summary, issue_type }): Promise<any> {
+    return {};
     try {
       const curl = await fetch(`${project.split('|')[1]}/rest/api/3/issue`, {
         method: 'POST',
