@@ -7,8 +7,7 @@ export class TelegramController {
 
   @Post('/webhook')
   async webhook(@Req() request: Request): Promise<any> {
-    console.log(request);
-    await this.telegramService.webhook(request);
+    await this.telegramService.webhook(request.body);
     return 'Ok';
   }
 }
