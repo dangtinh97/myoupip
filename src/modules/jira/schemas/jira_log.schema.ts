@@ -18,4 +18,8 @@ export class JiraLog {
   project_key: string;
 }
 
+export enum EVENT {
+  ISSUE_CREATE = 'issue_created',
+}
+
 export const JiraLogSchema = SchemaFactory.createForClass(JiraLog);

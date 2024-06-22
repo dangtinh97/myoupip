@@ -7,7 +7,6 @@ export class JiraController {
 
   @Post('/webhook')
   async webhook(@Req() req: Request): Promise<any> {
-    console.log(req.body);
     await this.jiraService.webhook(req.body);
     return 'OK';
   }
