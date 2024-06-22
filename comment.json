@@ -1,0 +1,95 @@
+{
+  "timestamp": 1718903924351,
+  "webhookEvent": "comment_created",
+  "comment": {
+    "self": "https://magestore-test.atlassian.net/rest/api/2/issue/10054/comment/10000",
+    "id": "10000",
+    "author": {
+      "self": "https://magestore-test.atlassian.net/rest/api/2/user?accountId=5e781ecc1e65980c429674de",
+      "accountId": "5e781ecc1e65980c429674de",
+      "avatarUrls": {
+        "48x48": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5e781ecc1e65980c429674de/965f4910-67dc-4d0c-8342-5de3cf78259a/48",
+        "24x24": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5e781ecc1e65980c429674de/965f4910-67dc-4d0c-8342-5de3cf78259a/24",
+        "16x16": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5e781ecc1e65980c429674de/965f4910-67dc-4d0c-8342-5de3cf78259a/16",
+        "32x32": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5e781ecc1e65980c429674de/965f4910-67dc-4d0c-8342-5de3cf78259a/32"
+      },
+      "displayName": "Đăng Tính Official",
+      "active": true,
+      "timeZone": "Asia/Saigon",
+      "accountType": "atlassian"
+    },
+    "body": "demo comment",
+    "updateAuthor": {
+      "self": "https://magestore-test.atlassian.net/rest/api/2/user?accountId=5e781ecc1e65980c429674de",
+      "accountId": "5e781ecc1e65980c429674de",
+      "avatarUrls": {
+        "48x48": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5e781ecc1e65980c429674de/965f4910-67dc-4d0c-8342-5de3cf78259a/48",
+        "24x24": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5e781ecc1e65980c429674de/965f4910-67dc-4d0c-8342-5de3cf78259a/24",
+        "16x16": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5e781ecc1e65980c429674de/965f4910-67dc-4d0c-8342-5de3cf78259a/16",
+        "32x32": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5e781ecc1e65980c429674de/965f4910-67dc-4d0c-8342-5de3cf78259a/32"
+      },
+      "displayName": "Đăng Tính Official",
+      "active": true,
+      "timeZone": "Asia/Saigon",
+      "accountType": "atlassian"
+    },
+    "created": "2024-06-21T00:18:44.351+0700",
+    "updated": "2024-06-21T00:18:44.351+0700",
+    "jsdPublic": true
+  },
+  "issue": {
+    "id": "10054",
+    "self": "https://magestore-test.atlassian.net/rest/api/2/10054",
+    "key": "MD-55",
+    "fields": {
+      "summary": "dev 2",
+      "issuetype": {
+        "self": "https://magestore-test.atlassian.net/rest/api/2/issuetype/10002",
+        "id": "10002",
+        "description": "Tasks track small, distinct pieces of work.",
+        "iconUrl": "https://magestore-test.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10318?size=medium",
+        "name": "Task",
+        "subtask": false,
+        "avatarId": 10318,
+        "entityId": "f27ac47a-9c81-4a16-b846-71f22caff205",
+        "hierarchyLevel": 0
+      },
+      "project": {
+        "self": "https://magestore-test.atlassian.net/rest/api/2/project/10000",
+        "id": "10000",
+        "key": "MD",
+        "name": "Magestore DEV",
+        "projectTypeKey": "software",
+        "simplified": true,
+        "avatarUrls": {
+          "48x48": "https://magestore-test.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10423",
+          "24x24": "https://magestore-test.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10423?size=small",
+          "16x16": "https://magestore-test.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10423?size=xsmall",
+          "32x32": "https://magestore-test.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10423?size=medium"
+        }
+      },
+      "assignee": null,
+      "priority": {
+        "self": "https://magestore-test.atlassian.net/rest/api/2/priority/3",
+        "iconUrl": "https://magestore-test.atlassian.net/images/icons/priorities/medium.svg",
+        "name": "Medium",
+        "id": "3"
+      },
+      "status": {
+        "self": "https://magestore-test.atlassian.net/rest/api/2/status/10000",
+        "description": "",
+        "iconUrl": "https://magestore-test.atlassian.net/",
+        "name": "To Do",
+        "id": "10000",
+        "statusCategory": {
+          "self": "https://magestore-test.atlassian.net/rest/api/2/statuscategory/2",
+          "id": 2,
+          "key": "new",
+          "colorName": "blue-gray",
+          "name": "To Do"
+        }
+      }
+    }
+  },
+  "eventType": "primaryAction"
+}

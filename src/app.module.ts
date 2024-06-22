@@ -6,8 +6,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { YoutubeModule } from './Youtube/youtube.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TelegramModule } from './telegram/telegram.module';
-import { ScheduleModule } from '@nestjs/schedule';
 import { CronModule } from './modules/schedule/schedule.module';
+import { JiraModule } from "./modules/jira/jira.module";
 
 @Module({
   imports: [
@@ -28,6 +28,7 @@ import { CronModule } from './modules/schedule/schedule.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    JiraModule,
   ],
   controllers: [AppController],
   providers: [AppService],

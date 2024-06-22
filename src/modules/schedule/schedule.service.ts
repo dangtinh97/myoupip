@@ -12,7 +12,7 @@ export class ScheduleService {
     private healthModel: Model<LcmHealthDocument>,
   ) {}
 
-  @Cron('*/60 * * * * *')
+  // @Cron('*/60 * * * * *')
   async handleCron() {
     console.log('run', new Date());
     const list: any = await this.healthModel.find({
