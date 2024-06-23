@@ -22,6 +22,9 @@ export class JiraProject {
 
   @Prop({ type: Object })
   sync_project: any;
+
+  @Prop()
+  project_key: string;
 }
 
 export enum EVENT {

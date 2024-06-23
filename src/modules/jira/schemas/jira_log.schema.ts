@@ -20,6 +20,7 @@ export class JiraLog {
 
 export enum EVENT {
   ISSUE_CREATE = 'issue_created',
+  COMMENT_CREATE = 'comment_created',
 }
 
 export const JiraLogSchema = SchemaFactory.createForClass(JiraLog);

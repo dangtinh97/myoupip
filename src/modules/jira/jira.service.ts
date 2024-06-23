@@ -20,7 +20,8 @@ export class JiraService {
   ) {}
 
   public async webhook(body: any) {
-    const event = _.get(body, 'issue_event_type_name', '');
+    const webhookEvent = _.get(body, 'webhookEvent', '');
+    const event = _.get(body, 'issue_event_type_name', webhookEvent);
     await this.jiraLogModel.create({
       key: 'WEBHOOK',
       data: body,
@@ -29,6 +30,10 @@ export class JiraService {
     });
     if (event === EVENT.ISSUE_CREATE) {
       return await this.createIssue(_.get(body, 'issue', {}));
+    }
+
+    if (event === EVENT.COMMENT_CREATE) {
+      return this.createComment(body);
     }
   }
 
@@ -60,7 +65,7 @@ export class JiraService {
       console.log('DUPLICATE');
       return;
     }
-    const newIssue = await this.sync({
+    const newIssue = await this.syncIssue({
       project: projectNew,
       summary: summary,
       issue_type: issueType,
@@ -72,10 +77,11 @@ export class JiraService {
       issue_type: issueType,
       sync_project: newIssue,
       from_issue_key: _.get(issue, 'key', ''),
+      project_key: projectKey,
     });
   }
 
-  async sync({ project, summary, issue_type }): Promise<any> {
+  async syncIssue({ project, summary, issue_type }): Promise<any> {
     try {
       const curl = await fetch(`${project.split('|')[1]}/rest/api/3/issue`, {
         method: 'POST',
@@ -95,7 +101,11 @@ export class JiraService {
           },
         }),
       });
-      return await curl.json();
+      const json = await curl.json();
+      return {
+        ...json,
+        project_key: project.split('|')[0],
+      };
     } catch (e: any) {
       return {
         data: {
@@ -106,5 +116,27 @@ export class JiraService {
         error: e.message,
       };
     }
+  }
+
+  async createComment(body: any) {
+    const project = this.getProject(_.get(body, 'issue'));
+    return '';
+  }
+
+  async getProject(issue: any) {
+    const id = _.get(issue, 'id', '');
+    const projectKey = _.get(issue, 'fields.project.key', '');
+    const projectNew =
+      projectKey === process.env.KEY_PROJECT_FIRST
+        ? process.env.PROJECT_SECOND
+        : process.env.PROJECT_FIRST;
+    return {
+      issue_id: id,
+      project_key: projectKey,
+      sync_project: {
+        project_key: projectNew.split('|')[0],
+        project_url: projectNew.split('|')[1],
+      },
+    };
   }
 }
